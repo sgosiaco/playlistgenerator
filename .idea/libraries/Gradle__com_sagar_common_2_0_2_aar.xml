@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Gradle: com.sagar:common:2.0.2@aar">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/721bf2863040dc25cbfc7e6dd88a0389/common-2.0.2/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/721bf2863040dc25cbfc7e6dd88a0389/common-2.0.2/res" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.sagar/common/2.0.2/f0c0d37ac089a9ab80c4528b66884994031ea7d/common-2.0.2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.sagar/common/2.0.2/9fb5ff6682d32ffc136f6908af57f9fa8d895b2/common-2.0.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
