@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.Environment
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.DatePicker
@@ -41,7 +42,9 @@ class MainActivity : AppCompatActivity() {
             .add(R.id.main_fragment, MainActivityFragment.newInstance(), "songList")
             .commit()
 
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener {
+            val frag = supportFragmentManager.findFragmentById(R.id.main_fragment) as MainActivityFragment?
+            frag?.export()
             Toast.makeText(this, "Saved", Toast.LENGTH_LONG).show()
         }
 
@@ -63,11 +66,13 @@ class MainActivity : AppCompatActivity() {
             R.id.action_date -> {
                 val cal = Calendar.getInstance()
                 val dateListener =
-                    DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+                    DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
                         cal.set(Calendar.MONTH, month)
                         cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                         cal.set(Calendar.YEAR, year)
-                        Toast.makeText(this, cal.time.toString(), Toast.LENGTH_LONG).show()
+                        val frag = supportFragmentManager.findFragmentById(R.id.main_fragment) as MainActivityFragment?
+                        Toast.makeText(this, "${cal.time}", Toast.LENGTH_LONG).show()
+                        frag?.setDate(cal.time.toInstant().toEpochMilli())
                     }
                 DatePickerDialog(this,
                     dateListener,

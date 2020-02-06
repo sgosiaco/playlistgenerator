@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_main.*
+import java.io.File
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -21,7 +22,20 @@ import java.util.*
 class MainActivityFragment : Fragment(), OnItemClickListener {
 
     private val songs = mutableListOf<Song>()
+    private val dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy")
+    private var targetDate = LocalDate.parse("01/01/2019", dateFormat).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()/1000
+    private val audioList = mutableListOf<Audio>()
 
+    private val projection = arrayOf(
+        MediaStore.Audio.Media._ID,
+        MediaStore.Audio.Media.TITLE,
+        MediaStore.Audio.Media.ARTIST,
+        MediaStore.Audio.Media.DATE_MODIFIED,
+        MediaStore.Audio.Media.DATA
+    )
+
+    private val selection = "${MediaStore.Audio.Media.DATE_MODIFIED} >= ?"
+    private val sortOrder = "${MediaStore.Audio.Media.DATE_MODIFIED} DESC"
 
     override fun onItemClicked(song: Song) {
         Toast.makeText(activity, "Song: ${song.title} ${song.path}", Toast.LENGTH_LONG).show()
@@ -37,22 +51,19 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val audioList = mutableListOf<Audio>()
+        rv_song_list.apply {
+            layoutManager = LinearLayoutManager(activity)
+            adapter = SongAdapter(songs, this@MainActivityFragment)
+            addItemDecoration(DividerItemDecoration(this.context, LinearLayoutManager.VERTICAL))
+        }
 
-        val projection = arrayOf(
-            MediaStore.Audio.Media._ID,
-            MediaStore.Audio.Media.TITLE,
-            MediaStore.Audio.Media.ARTIST,
-            MediaStore.Audio.Media.DATE_MODIFIED,
-            MediaStore.Audio.Media.DATA
-        )
+        updateList()
+    }
 
-        val format = DateTimeFormatter.ofPattern("MM dd yyyy")
-        val date = LocalDate.parse("01 01 2019", format).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()/1000
-        val selection = "${MediaStore.Audio.Media.DATE_MODIFIED} >= ?"
-        val selectionArgs = arrayOf(""+date)
-
-        val sortOrder = "${MediaStore.Audio.Media.DATE_MODIFIED} DESC"
+    private fun updateList() {
+        audioList.clear()
+        songs.clear()
+        val selectionArgs = arrayOf(""+targetDate)
 
         val query = activity?.contentResolver?.query(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -73,7 +84,7 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
                 val id = cursor.getLong(idCol)
                 val title = cursor.getString(titleCol)
                 val artist = cursor.getString(artistCol)
-                val date = DateTimeFormatter.ofPattern("MM/dd/yyyy").withLocale(Locale.getDefault()).withZone(ZoneId.systemDefault()).format(Instant.ofEpochSecond(cursor.getLong(dateCol)))
+                val date = dateFormat.withLocale(Locale.getDefault()).withZone(ZoneId.systemDefault()).format(Instant.ofEpochSecond(cursor.getLong(dateCol)))
                 val contentUri: Uri = ContentUris.withAppendedId(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                     id
@@ -86,13 +97,25 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
         for(audio in audioList) {
             songs.add(Song(audio.title, audio.artist, audio.date, audio.data))
         }
-
-        rv_song_list.apply {
-            layoutManager = LinearLayoutManager(activity)
-            adapter = SongAdapter(songs, this@MainActivityFragment)
-            addItemDecoration(DividerItemDecoration(this.context, LinearLayoutManager.VERTICAL))
-        }
+        rv_song_list.adapter!!.notifyDataSetChanged()
     }
+
+    fun export() {
+        with(File("/storage/emulated/0/UAPP/PlayListsV3", "list.xml")) { if(exists()) { delete() } }
+        val dir = File("/storage/emulated/0/UAPP/PlayLists")
+        val file = File(dir, "list.m3u8")
+        var playlist = ""
+        for(song in songs) {
+            playlist += song.path+"\n"
+        }
+        file.writeText(playlist)
+    }
+
+    fun setDate(time: Long) {
+        targetDate = time/1000
+        updateList()
+    }
+
     companion object {
         fun newInstance(): MainActivityFragment = MainActivityFragment()
     }
