@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.android.synthetic.main.fragment_main.*
@@ -24,7 +25,8 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
 
     private val songs = mutableListOf<Song>()
     private val dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy")
-    private var targetDate = LocalDate.parse("01/01/2019", dateFormat).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()/1000
+    private val cal = Calendar.getInstance()
+    private var targetDate : Long = 0
     private val audioList = mutableListOf<Audio>()
 
     private val projection = arrayOf(
@@ -51,6 +53,11 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
+        var datePref = sharedPref.getString("date", "${cal.get(Calendar.MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.DAY_OF_MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.YEAR)}") ?: "${cal.get(Calendar.MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.DAY_OF_MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.YEAR)}"
+        datePref = "${(datePref.split("/")[0].toInt()+1).toString().padStart(2, '0')}/${datePref.split("/")[1]}/${datePref.split("/")[2]}"
+        targetDate = LocalDate.parse(datePref, dateFormat).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()/1000
 
         swipeList.apply {
             setOnRefreshListener {
@@ -117,23 +124,32 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
     }
 
     fun export() {
-        with(File("/storage/emulated/0/UAPP/PlayListsV3", "list.xml")) { if(exists()) { delete() } }
-        val dir = File("/storage/emulated/0/UAPP/PlayLists")
-        val file = File(dir, "list.m3u8")
+        val sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
+        val dirPref = sharedPref.getString("directory", "/PlaylistGenerator") ?: "/PlaylistGenerator"
+        val filename = sharedPref.getString("filename", "list.m3u8") ?: "list.m3u8"
+        val UAPP = sharedPref.getBoolean("uapp", false)
+        var dir = File("/storage/emulated/0$dirPref")
+        var file = File(dir, filename)
+
         var playlist = ""
         for(song in songs) {
             playlist += song.path+"\n"
         }
+
+        dir.mkdir()
         file.writeText(playlist)
+
+        if(UAPP) {
+            with(File("/storage/emulated/0/UAPP/PlayListsV3", "${filename?.split(".")?.get(0)}.xml")) { if(exists()) { delete() } }
+            dir = File("/storage/emulated/0/UAPP/PlayLists")
+            file = File(dir, filename)
+            file.writeText(playlist)
+        }
     }
 
     fun setDate(time: Long) {
         targetDate = time/1000
         updateList()
-    }
-
-    companion object {
-        fun newInstance(): MainActivityFragment = MainActivityFragment()
     }
 }
 

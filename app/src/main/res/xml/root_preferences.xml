@@ -14,37 +14,33 @@
   ~ limitations under the License.
   -->
 
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <PreferenceCategory app:title="@string/messages_header">
+    <PreferenceCategory app:title="@string/save_header">
 
         <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
-            app:useSimpleSummaryProvider="true" />
+            app:key="date"
+            app:isPreferenceVisible="false">
+        </EditTextPreference>
 
-        <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
-            app:useSimpleSummaryProvider="true" />
+        <EditTextPreference
+            app:key="directory"
+            app:title="@string/directory_title"
+            app:useSimpleSummaryProvider="true">
+        </EditTextPreference>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory app:title="@string/sync_header">
-
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
+        <EditTextPreference
+            app:key="filename"
+            app:title="@string/filename_title"
+            app:useSimpleSummaryProvider="true">
+        </EditTextPreference>
 
         <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
+            app:key="uapp"
+            app:summaryOff="@string/uapp_summary_off"
+            app:summaryOn="@string/uapp_summary_on"
+            app:title="@string/uapp" />
 
     </PreferenceCategory>
 

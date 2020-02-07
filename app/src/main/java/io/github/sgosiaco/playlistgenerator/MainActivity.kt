@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentTransaction
+import androidx.preference.PreferenceManager
 import com.eazypermissions.common.model.PermissionResult
 import com.eazypermissions.dsl.extension.requestPermissions
 
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
 
         supportFragmentManager
             .beginTransaction()
-            .add(R.id.main_fragment, MainActivityFragment.newInstance(), "songList")
+            .add(R.id.main_fragment, MainActivityFragment(), "songList")
             .commit()
 
         fab.setOnClickListener {
@@ -65,14 +66,21 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.action_date -> {
                 val cal = Calendar.getInstance()
+                val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
+                val datePref = sharedPref.getString("date", "${cal.get(Calendar.MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.DAY_OF_MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.YEAR)}") ?: "${cal.get(Calendar.MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.DAY_OF_MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.YEAR)}"
+                val monthPref = datePref.split("/")[0].toInt()
+                val dayPref = datePref.split("/")[1].toInt()
+                val yearPref = datePref.split("/")[2].toInt()
+                cal.set(yearPref, monthPref, dayPref)
                 val dateListener =
                     DatePickerDialog.OnDateSetListener { _, year, month, dayOfMonth ->
+                        sharedPref.edit().putString("date", "${month.toString().padStart(2, '0')}/${dayOfMonth.toString().padStart(2, '0')}/$year").apply()
                         cal.set(Calendar.MONTH, month)
                         cal.set(Calendar.DAY_OF_MONTH, dayOfMonth)
                         cal.set(Calendar.YEAR, year)
                         val frag = supportFragmentManager.findFragmentById(R.id.main_fragment) as MainActivityFragment?
-                        Toast.makeText(this, "${cal.time}", Toast.LENGTH_LONG).show()
                         frag?.setDate(cal.time.toInstant().toEpochMilli())
+                        Toast.makeText(this, "${cal.time}", Toast.LENGTH_LONG).show()
                     }
                 DatePickerDialog(this,
                     dateListener,
