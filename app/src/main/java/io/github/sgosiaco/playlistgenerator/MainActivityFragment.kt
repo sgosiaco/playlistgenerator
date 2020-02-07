@@ -55,7 +55,7 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
-        var datePref = sharedPref.getString("date", "${cal.get(Calendar.MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.DAY_OF_MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.YEAR)}") ?: "${cal.get(Calendar.MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.DAY_OF_MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.YEAR)}"
+        var datePref = sharedPref.getString("date", cal.formatString()) ?: cal.formatString()
         datePref = "${(datePref.split("/")[0].toInt()+1).toString().padStart(2, '0')}/${datePref.split("/")[1]}/${datePref.split("/")[2]}"
         targetDate = LocalDate.parse(datePref, dateFormat).atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli()/1000
 
@@ -140,7 +140,7 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
         file.writeText(playlist)
 
         if(UAPP) {
-            with(File("/storage/emulated/0/UAPP/PlayListsV3", "${filename?.split(".")?.get(0)}.xml")) { if(exists()) { delete() } }
+            with(File("/storage/emulated/0/UAPP/PlayListsV3", "${filename.split(".")[0]}.xml")) { if(exists()) { delete() } }
             dir = File("/storage/emulated/0/UAPP/PlayLists")
             file = File(dir, filename)
             file.writeText(playlist)

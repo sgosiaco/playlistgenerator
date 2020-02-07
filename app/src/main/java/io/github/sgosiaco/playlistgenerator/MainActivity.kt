@@ -5,15 +5,11 @@ import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
-import android.os.Environment
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.DatePicker
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.FragmentTransaction
 import androidx.preference.PreferenceManager
 import com.eazypermissions.common.model.PermissionResult
 import com.eazypermissions.dsl.extension.requestPermissions
@@ -67,7 +63,7 @@ class MainActivity : AppCompatActivity() {
             R.id.action_date -> {
                 val cal = Calendar.getInstance()
                 val sharedPref = PreferenceManager.getDefaultSharedPreferences(this)
-                val datePref = sharedPref.getString("date", "${cal.get(Calendar.MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.DAY_OF_MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.YEAR)}") ?: "${cal.get(Calendar.MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.DAY_OF_MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.YEAR)}"
+                val datePref = sharedPref.getString("date", cal.formatString()) ?: cal.formatString()
                 val monthPref = datePref.split("/")[0].toInt()
                 val dayPref = datePref.split("/")[1].toInt()
                 val yearPref = datePref.split("/")[2].toInt()

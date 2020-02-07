@@ -43,10 +43,8 @@ class SettingsActivity : AppCompatActivity() {
 
             if(TextUtils.isEmpty(datePref?.text)) {
                 val cal = Calendar.getInstance()
-                datePref?.text = "${cal.get(Calendar.MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.DAY_OF_MONTH).toString().padStart(2, '0')}/${cal.get(Calendar.YEAR)}"
+                datePref?.text = cal.formatString()
             }
-
-
         }
     }
 }
