@@ -127,7 +127,7 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
         val sharedPref = PreferenceManager.getDefaultSharedPreferences(context)
         val dirPref = sharedPref.getString("directory", "/PlaylistGenerator") ?: "/PlaylistGenerator"
         val filename = sharedPref.getString("filename", "list.m3u8") ?: "list.m3u8"
-        val UAPP = sharedPref.getBoolean("uapp", false)
+        val uapp = sharedPref.getBoolean("uapp", false)
         var dir = File("/storage/emulated/0$dirPref")
         var file = File(dir, filename)
 
@@ -139,7 +139,7 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
         dir.mkdir()
         file.writeText(playlist)
 
-        if(UAPP) {
+        if(uapp) {
             with(File("/storage/emulated/0/UAPP/PlayListsV3", "${filename.split(".")[0]}.xml")) { if(exists()) { delete() } }
             dir = File("/storage/emulated/0/UAPP/PlayLists")
             file = File(dir, filename)
@@ -152,11 +152,5 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
         updateList()
     }
 }
-
-data class Audio(val uri: Uri,
-                 val title: String,
-                 val artist: String,
-                 val date: String,
-                 val data: String)
 
 

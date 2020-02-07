@@ -1,16 +1,10 @@
 package io.github.sgosiaco.playlistgenerator
 
-import android.app.Activity
-import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.EditTextPreference
-import androidx.preference.Preference
-import androidx.preference.PreferenceDataStore
 import androidx.preference.PreferenceFragmentCompat
-import org.w3c.dom.Text
 import java.util.*
 
 class SettingsActivity : AppCompatActivity() {

@@ -11,7 +11,7 @@
         android:ellipsize="end"
         android:maxLines="1"
         android:scrollHorizontally="true"
-        android:text="title"
+        android:text="@string/title"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -27,14 +27,14 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:scrollHorizontally="true"
-            android:text="artist"
+            android:text="@string/artist"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/songYear"
+            android:id="@+id/songDate"
             android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:text="year"
+            android:text="@string/date"
             android:textSize="18sp" />
     </LinearLayout>
 </LinearLayout>

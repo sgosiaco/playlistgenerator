@@ -11,4 +11,7 @@
     <string name="uapp_summary_off">Not overwriting UAPP Playlist</string>
     <string name="uapp_summary_on">Overwriting UAPP Playlist</string>
     <string name="filename_title">Filename</string>
+    <string name="title">title</string>
+    <string name="artist">artist</string>
+    <string name="date">date</string>
 </resources>

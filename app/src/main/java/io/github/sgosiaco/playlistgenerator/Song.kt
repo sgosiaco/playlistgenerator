@@ -1,11 +1,13 @@
 package io.github.sgosiaco.playlistgenerator
 
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 data class Song(val title: String, val artist: String, val date: String, val path: String)
+data class Audio(val uri: Uri, val title: String, val artist: String, val date: String, val data: String)
 
 class SongAdapter(private val list: List<Song>, private val itemClickListener: OnItemClickListener) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
@@ -30,7 +32,7 @@ class SongAdapter(private val list: List<Song>, private val itemClickListener: O
         init {
             titleView = itemView.findViewById(R.id.songTitle)
             artistView = itemView.findViewById(R.id.songArtist)
-            dateView = itemView.findViewById(R.id.songYear)
+            dateView = itemView.findViewById(R.id.songDate)
         }
 
         fun bind(song: Song, clickListener: OnItemClickListener) {
