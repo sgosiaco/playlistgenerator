@@ -34,7 +34,8 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
         MediaStore.Audio.Media.TITLE,
         MediaStore.Audio.Media.ARTIST,
         MediaStore.Audio.Media.DATE_MODIFIED,
-        MediaStore.Audio.Media.DATA
+        MediaStore.Audio.Media.DATA,
+        MediaStore.Audio.Media.ALBUM_ID
     )
 
     private val selection = "${MediaStore.Audio.Media.DATE_MODIFIED} >= ?"
@@ -86,7 +87,7 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
     private fun updateList() {
         audioList.clear()
         songs.clear()
-        val selectionArgs = arrayOf(""+targetDate)
+        val selectionArgs = arrayOf("$targetDate")
 
         val query = activity?.contentResolver?.query(
             MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -102,6 +103,8 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
             val artistCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
             val dateCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
             val dataCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
+            val albumCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
+
 
             while(cursor.moveToNext()) {
                 val id = cursor.getLong(idCol)
@@ -113,12 +116,14 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
                     id
                 )
                 val data = cursor.getString(dataCol)
-                audioList.add(Audio(contentUri, title, artist, date, data))
+                val albumId = cursor.getString(albumCol)
+
+                audioList.add(Audio(contentUri, title, artist, date, data, albumId))
             }
         }
 
         for(audio in audioList) {
-            songs.add(Song(audio.title, audio.artist, audio.date, audio.data))
+            songs.add(Song(audio.title, audio.artist, audio.date, audio.data, generateArtUri(audio.albumId)))
         }
         rv_song_list.adapter!!.notifyDataSetChanged()
     }
