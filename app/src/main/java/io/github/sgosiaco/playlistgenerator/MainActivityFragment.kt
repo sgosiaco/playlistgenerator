@@ -20,6 +20,7 @@ import java.time.LocalDate
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.math.min
 
 class MainActivityFragment : Fragment(), OnItemClickListener {
 
@@ -27,12 +28,12 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
     private val dateFormat = DateTimeFormatter.ofPattern("MM/dd/yyyy")
     private val cal = Calendar.getInstance()
     private var targetDate : Long = 0
-    private val audioList = mutableListOf<Audio>()
 
     private val projection = arrayOf(
         MediaStore.Audio.Media._ID,
         MediaStore.Audio.Media.TITLE,
         MediaStore.Audio.Media.ARTIST,
+        MediaStore.Audio.Media.DURATION,
         MediaStore.Audio.Media.DATE_MODIFIED,
         MediaStore.Audio.Media.DATA,
         MediaStore.Audio.Media.ALBUM_ID
@@ -85,7 +86,6 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
     }
 
     private fun updateList() {
-        audioList.clear()
         songs.clear()
         val selectionArgs = arrayOf("$targetDate")
 
@@ -101,6 +101,7 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
             val idCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
             val titleCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE)
             val artistCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST)
+            val durationCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
             val dateCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATE_MODIFIED)
             val dataCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA)
             val albumCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID)
@@ -110,6 +111,7 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
                 val id = cursor.getLong(idCol)
                 val title = cursor.getString(titleCol)
                 val artist = cursor.getString(artistCol)
+                val duration = cursor.getString(durationCol).toLong()
                 val date = dateFormat.withLocale(Locale.getDefault()).withZone(ZoneId.systemDefault()).format(Instant.ofEpochSecond(cursor.getLong(dateCol)))
                 val contentUri: Uri = ContentUris.withAppendedId(
                     MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
@@ -118,13 +120,15 @@ class MainActivityFragment : Fragment(), OnItemClickListener {
                 val data = cursor.getString(dataCol)
                 val albumId = cursor.getString(albumCol)
 
-                audioList.add(Audio(contentUri, title, artist, date, data, albumId))
+                val hours = duration / 3600000
+                val minutes = (duration / 60000) % 60000
+                val seconds = duration % 60000 /1000
+                val length = if(hours > 1) { "$hours:$minutes:${seconds.toString().padStart(2, '0')}" } else { "$minutes:${seconds.toString().padStart(2, '0')}" }
+
+                songs.add(Song(title, artist, length, date, data, generateArtUri(albumId)))
             }
         }
 
-        for(audio in audioList) {
-            songs.add(Song(audio.title, audio.artist, audio.date, audio.data, generateArtUri(audio.albumId)))
-        }
         rv_song_list.adapter!!.notifyDataSetChanged()
     }
 

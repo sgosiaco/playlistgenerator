@@ -15,4 +15,5 @@
     <string name="artist">artist</string>
     <string name="date">date</string>
     <string name="album_art">Album Art</string>
+    <string name="duration">duration</string>
 </resources>

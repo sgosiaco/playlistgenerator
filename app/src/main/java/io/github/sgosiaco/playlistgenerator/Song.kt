@@ -8,8 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 
-data class Song(val title: String, val artist: String, val date: String, val path: String, val art: Uri)
-data class Audio(val uri: Uri, val title: String, val artist: String, val date: String, val data: String, val albumId: String)
+data class Song(val title: String, val artist: String, val duration: String, val date: String, val path: String, val art: Uri)
 
 class SongAdapter(private val list: List<Song>, private val itemClickListener: OnItemClickListener) : RecyclerView.Adapter<SongAdapter.SongViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
@@ -42,7 +41,7 @@ class SongAdapter(private val list: List<Song>, private val itemClickListener: O
 
         fun bind(song: Song, clickListener: OnItemClickListener) {
             titleView?.text = song.title
-            artistView?.text = song.artist
+            artistView?.text = String.format("%s (%s)", song.artist, song.duration)
             dateView?.text = song.date
             albumView?.let {
                 Glide
